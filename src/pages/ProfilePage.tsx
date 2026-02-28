@@ -4,7 +4,7 @@ import { updateProfile } from '../api/auth'
 import { AxiosError } from 'axios'
 
 export default function ProfilePage() {
-  const { user, login } = useAuth()
+  const { user } = useAuth()
   const [name, setName] = useState(user?.name ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
   const [infoSuccess, setInfoSuccess] = useState(false)
