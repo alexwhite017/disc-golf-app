@@ -5,6 +5,7 @@ import { getRounds, createRound, updateRound, deleteRound } from '../api/rounds'
 import { getCourses } from '../api/courses'
 import type { Round } from '../types'
 import ConfirmButton from '../components/ConfirmButton'
+import { useAuth } from '../context/AuthContext'
 
 function formatVsPar(value: number | null): string {
   if (value === null) return '—'
@@ -122,45 +123,62 @@ function RoundFormModal({ round, onClose }: { round?: Round; onClose: () => void
   )
 }
 
-function RoundRow({ round, onEdit, onDelete }: {
+function RoundRow({ round, currentUserId, onEdit, onDelete }: {
   round: Round
+  currentUserId: number
   onEdit: (round: Round) => void
   onDelete: (id: number) => void
 }) {
+  const myTotals = round.player_totals?.[String(currentUserId)]
+  const scoreVsPar = myTotals?.score_vs_par ?? null
+  const totalScore = myTotals?.total_score ?? null
+  const isCreator = round.user_id === currentUserId
+  const playerCount = round.players?.length ?? 1
+
   return (
     <div className="flex items-center justify-between rounded-lg bg-slate-800 border border-slate-700 px-4 py-3 hover:border-green-600 hover:bg-slate-700/60 transition-colors">
       <Link to={`/rounds/${round.id}`} className="flex flex-col gap-0.5 flex-1 min-w-0">
-        <span className="font-medium text-white">{round.course?.name ?? 'Unknown course'}</span>
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-white">{round.course?.name ?? 'Unknown course'}</span>
+          {playerCount > 1 && (
+            <span className="text-xs text-slate-500 bg-slate-700 px-1.5 py-0.5 rounded">
+              {playerCount} players
+            </span>
+          )}
+        </div>
         <span className="text-sm text-slate-400">{round.played_at}</span>
         {round.notes && <span className="text-xs text-slate-500 mt-0.5">{round.notes}</span>}
       </Link>
       <div className="flex items-center gap-6 ml-4">
         <div className="text-right">
-          <div className={`text-lg font-semibold ${vsParColor(round.score_vs_par)}`}>
-            {formatVsPar(round.score_vs_par)}
+          <div className={`text-lg font-semibold ${vsParColor(scoreVsPar)}`}>
+            {formatVsPar(scoreVsPar)}
           </div>
-          {round.total_score !== null && (
-            <div className="text-xs text-slate-500">{round.total_score} strokes</div>
+          {totalScore !== null && (
+            <div className="text-xs text-slate-500">{totalScore} strokes</div>
           )}
         </div>
-        <div className="flex flex-col items-end gap-1.5">
-          <button
-            onClick={() => onEdit(round)}
-            className="text-xs text-slate-400 hover:text-white transition-colors"
-          >
-            Edit
-          </button>
-          <ConfirmButton
-            onConfirm={() => onDelete(round.id)}
-            className="text-xs text-slate-600 hover:text-red-400 transition-colors"
-          />
-        </div>
+        {isCreator && (
+          <div className="flex flex-col items-end gap-1.5">
+            <button
+              onClick={() => onEdit(round)}
+              className="text-xs text-slate-400 hover:text-white transition-colors"
+            >
+              Edit
+            </button>
+            <ConfirmButton
+              onConfirm={() => onDelete(round.id)}
+              className="text-xs text-slate-600 hover:text-red-400 transition-colors"
+            />
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
 export default function RoundsPage() {
+  const { user } = useAuth()
   const [page, setPage] = useState(1)
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -278,6 +296,7 @@ export default function RoundsPage() {
             <RoundRow
               key={round.id}
               round={round}
+              currentUserId={user!.id}
               onEdit={setModalRound}
               onDelete={(id) => deleteMutation.mutate(id)}
             />

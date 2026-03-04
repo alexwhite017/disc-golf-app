@@ -6,6 +6,11 @@ export interface User {
   created_at: string
 }
 
+export interface SearchUser {
+  id: number
+  name: string
+}
+
 export interface Course {
   id: number
   name: string
@@ -34,8 +39,8 @@ export interface Round {
   course_id: number
   played_at: string
   notes: string | null
-  total_score: number | null
-  score_vs_par: number | null
+  players: User[]
+  player_totals: Record<string, { total_score: number | null; score_vs_par: number | null }>
   course: Course | null
   scores: Score[]
   created_at: string
@@ -46,6 +51,7 @@ export interface Score {
   id: number
   round_id: number
   hole_id: number
+  user_id: number
   strokes: number
   hole: Hole | null
 }

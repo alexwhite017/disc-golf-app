@@ -29,3 +29,9 @@ export const upsertScore = (roundId: number, data: { hole_id: number; strokes: n
 
 export const deleteScore = (roundId: number, scoreId: number) =>
   client.delete(`/rounds/${roundId}/scores/${scoreId}`)
+
+export const addPlayer = (roundId: number, userId: number) =>
+  client.post(`/rounds/${roundId}/players`, { user_id: userId })
+
+export const removePlayer = (roundId: number, userId: number) =>
+  client.delete(`/rounds/${roundId}/players/${userId}`)
