@@ -23,7 +23,7 @@ function LeaderboardTable({ entries }: { entries: LeaderboardEntry[] }) {
   }
 
   return (
-    <div className="rounded-lg border border-slate-700 overflow-hidden">
+    <div className="rounded-lg border border-slate-700 overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-slate-800 text-slate-400 text-left">
@@ -84,12 +84,12 @@ export default function LeaderboardPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
         <select
           value={courseId ?? ''}
           onChange={(e) => setCourseId(e.target.value === '' ? null : Number(e.target.value))}
-          className="rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white focus:border-green-500 focus:outline-none"
+          className="w-full sm:w-auto rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white focus:border-green-500 focus:outline-none"
         >
           <option value="">Overall</option>
           {courses?.data.map((c) => (
